@@ -7,10 +7,19 @@ if [[ "$MODE" == 'mock' || "$MODE" == 'test' ]]; then
   URL="https://${ID}.execute-api.${AWS_REGION}.amazonaws.com/test/clientes/CLI001/cuentas"
   EXPECTED=200
   BODY=$(mktemp)
-  CODE=$(curl --retry 5 --retry-delay 3 --retry-all-errors -sS -o "$BODY" -w '%{http_code}' "$URL")
+  # Origen esperado según el modo (MOCK o LAMBDA)
+  if [[ "$MODE" == 'test' ]]; then ORIGEN='LAMBDA'; else ORIGEN='MOCK'; fi
+  # Tras create-deployment el stage tarda unos segundos en propagarse:
+  # se reintenta hasta ver el origen esperado (máx. 12 intentos, 10 s entre ellos).
+  CODE=''
+  for i in {1..12}; do
+    CODE=$(curl --retry 5 --retry-delay 3 --retry-all-errors -sS -o "$BODY" -w '%{http_code}' "$URL")
+    if [[ "$CODE" == "$EXPECTED" ]] && grep -q "\"origen\":\"${ORIGEN}\"" "$BODY"; then break; fi
+    echo "Intento ${i}/12: HTTP ${CODE}, aún sin origen ${ORIGEN}; reintentando..."
+    sleep 10
+  done
   [[ "$CODE" == "$EXPECTED" ]] || { cat "$BODY"; echo "HTTP ${CODE}, esperado ${EXPECTED}"; exit 1; }
-  if [[ "$MODE" == 'test' ]]; then grep -q '"origen":"LAMBDA"' "$BODY" || { cat "$BODY"; echo 'No llegó a Lambda'; exit 1; }; fi
-  if [[ "$MODE" == 'mock' ]]; then grep -q '"origen":"MOCK"' "$BODY" || { cat "$BODY"; echo 'No llegó a mock'; exit 1; }; fi
+  grep -q "\"origen\":\"${ORIGEN}\"" "$BODY" || { cat "$BODY"; echo "No llegó a ${ORIGEN}"; exit 1; }
   rm -f "$BODY"
   echo "Smoke ${MODE}: OK 200"
 elif [[ "$MODE" == 'prod' ]]; then
