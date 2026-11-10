@@ -1,7 +1,7 @@
 // Datos totalmente ficticios. NO persiste cuentas. Modificar ENABLE_POST para el propuesto.
 export const ENABLE_POST = false;
 const clientes = {
-  CLI001: [{ numeroCuenta: '1000000001', tipo: 'AHORROS', moneda: 'PEN', titular: 'Cliente de prueba', saldo: 100.0 }],
+  CLI001: [{ numeroCuenta: '1000000001', tipo: 'AHORROS', moneda: 'PEN', titular: 'Ana Pérez (ficticio)', saldo: 100.0 }],
   CLI002: [{ numeroCuenta: '1000000002', tipo: 'CORRIENTE', moneda: 'USD', titular: 'Otro cliente', saldo: 200.0 }]
 };
 const headers = { 'content-type': 'application/json', 'access-control-allow-origin': '*', 'access-control-allow-headers': 'Content-Type,x-api-key', 'access-control-allow-methods': 'GET,POST,OPTIONS' };
