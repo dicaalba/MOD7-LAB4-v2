@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: API de Cuentas Bancarias
   version: "" # LAB: sustituir por 1.0.0
-  description: API educativa para consultar cuentas bancarias ficticias.
+  description: API educativa para consultar cuentas bancarias ficticias (laboratorio MOD7).
   contact:
     name: Equipo API
     email: api@example.org
