@@ -46,6 +46,54 @@ paths:
             responseTemplates:
               application/json: |
                 {"origen":"MOCK","clienteId":"$util.escapeJavaScript($input.params('cliente-id'))","cuentas":[{"numeroCuenta":"1000000001","tipo":"AHORROS","moneda":"PEN","titular":"Cliente de prueba","saldo":100.0}]}
+    post:
+      tags: [Cuentas]
+      summary: Crear una cuenta simulada
+      operationId: crearCuentaCliente
+      parameters:
+        - name: cliente-id
+          in: path
+          required: true
+          description: Identificador de cliente
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tipo, moneda, titular]
+              properties:
+                tipo: {type: string, enum: [AHORROS, CORRIENTE]}
+                moneda: {type: string, enum: [PEN, USD]}
+                titular: {type: string, minLength: 1}
+      responses:
+        '201':
+          description: Creación simulada exitosa (sin persistencia)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cuenta'
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problema'
+        '404':
+          description: Cliente no encontrado
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 201}'
+        passthroughBehavior: never
+        responses:
+          default:
+            statusCode: '201'
+            responseTemplates:
+              application/json: |
+                {"numeroCuenta":"SIMULADO-0001","tipo":"AHORROS","moneda":"PEN","titular":"Cliente (Mock)","saldo":0}
 components:
   schemas:
     Cuenta:
